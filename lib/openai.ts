@@ -28,7 +28,7 @@ export async function getEmbeddings(text: string) {
 }
 
 export async function getEmbeddingForNote(title: string, content?: string ) {
- return getEmbeddings(`Title: ${title}\nContent: ${content}`);
+  return getEmbeddings(`Title: ${title}\nContent: ${content}`);
 }
 
 export default openai;

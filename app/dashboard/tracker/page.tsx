@@ -1,7 +1,7 @@
 export default function Tracker () {
-    return (
-        <div>
+  return (
+    <div>
             The tracker
-        </div>
-    )
+    </div>
+  )
 } 

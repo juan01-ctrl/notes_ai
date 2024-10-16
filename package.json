@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.66",
@@ -26,11 +27,12 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
+    "eslint-plugin-align-import": "^1.0.0",
+    "eslint-plugin-import": "^2.31.0",
     "lucide-react": "^0.452.0",
     "next": "14.2.15",
     "next-themes": "^0.3.0",
     "openai": "^4.67.3",
-    "prettier": "^3.3.3",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.53.0",
@@ -47,6 +49,8 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.15",
     "postcss": "^8",
+    "prettier": "^3.3.3",
+    "prettier-plugin-sort-imports": "^1.8.6",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

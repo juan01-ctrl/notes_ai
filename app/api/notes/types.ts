@@ -1,6 +1,7 @@
-import { z } from "zod";
-import { createNoteSchema, deleteNoteSchema, updateNoteSchema } from "./validation";
 import { Note } from "@prisma/client";
+import { z }    from "zod";
+
+import { createNoteSchema, deleteNoteSchema, updateNoteSchema } from "./validation";
 
 export type CreateNoteSchema = z.infer<typeof createNoteSchema>
 export type CreateNoteResponse = Note

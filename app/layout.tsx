@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import {
   ClerkProvider,
 } from '@clerk/nextjs'
-import localFont from "next/font/local";
+import type { Metadata } from "next";
+import localFont         from "next/font/local";
+
 import "./globals.css";
-import Providers from "./providers";
 import { Toaster } from "@/components/ui/toaster";
+
+import Providers from "./providers";
 // import { QueryClient } from "@tanstack/react-query";
 
 const geistSans = localFont({

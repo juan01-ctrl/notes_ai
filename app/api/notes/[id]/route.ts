@@ -1,81 +1,93 @@
-import prisma from "@/lib/db"
 import { NextRequest, NextResponse } from "next/server"
+
+import { runMiddlewares }      from "@/app/middlewares"
+import { requireAuth }         from "@/app/middlewares/requireAuth"
+import { validateRequest }     from "@/app/middlewares/validateRequest"
+import prisma                  from "@/lib/db"
+import { getEmbeddingForNote } from "@/lib/openai"
+import { index }               from "@/lib/pinecone"
+
 import { DeleteNoteSchema, UpdateNoteSchema } from "../types"
 import { deleteNoteSchema, updateNoteSchema } from "../validation"
-import { index } from "@/lib/pinecone"
-import { auth } from "@clerk/nextjs/server"
-import { getEmbeddingForNote } from "@/lib/openai"
 
 
-export const DELETE = async (_req: NextRequest, { params }: DeleteNoteSchema) => {
-    try {
-     const parseResult = deleteNoteSchema.safeParse({ params })
+
+
+
+export const DELETE = async (req: NextRequest, { params }: DeleteNoteSchema) => {
+  try {
+    const middlewareResult = await runMiddlewares<[string, DeleteNoteSchema]>([
+      () => requireAuth(),
+      () => validateRequest(req, params, deleteNoteSchema)
+    ], req);
+
+    if (middlewareResult instanceof NextResponse) {
+      return middlewareResult; 
+    }
+
+    const validatedData = middlewareResult[1]
  
     
-     if (!parseResult.success) {
-         return Response.json({ error: parseResult }, { status: 400 })
-     }
- 
-     const { id } = parseResult.data.params
+    const { id } = validatedData.params
 
      
-     const note = await prisma.$transaction(async (tx) => {
-        const deletedNote = await tx.note.delete({ where: { id } })
-        await index.deleteOne(id)
+    const note = await prisma.$transaction(async (tx) => {
+      const deletedNote = await tx.note.delete({ where: { id } })
+      await index.deleteOne(id)
 
-        return deletedNote
-     })
+      return deletedNote
+    })
  
 
-     return NextResponse.json(note, { status: 200 })
-    } catch (error) {
-        return NextResponse.json({
-          error: 'Failed to delete note'
-         }, { status: 500 })
+    return NextResponse.json(note, { status: 200 })
+  } catch (error) {
+    console.log(error)
+    return NextResponse.json({
+      error: error
+    }, { status: 500 })
+  }
+}
+
+ 
+export const PUT = async (req: NextRequest, { params }: Pick<UpdateNoteSchema, 'params'>) => {
+  try {
+    const middlewareResult = await runMiddlewares<[string, UpdateNoteSchema]>([
+      () => requireAuth(),
+      () => validateRequest(req, params, updateNoteSchema)
+    ], req);
+
+    if (middlewareResult instanceof NextResponse) {
+      return middlewareResult; 
     }
- }
 
- 
- export const PUT = async (_req: NextRequest, { params }: Pick<UpdateNoteSchema, 'params'>) => {
-    try {
-        const { userId } = auth()
-        const body = await _req.json()
-        const parseResult = updateNoteSchema.safeParse({ params, body })
- 
-    
-        if (!userId) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 })
-        }
+    const [userId, validatedData] = middlewareResult
 
-        if (!parseResult.success) {
-             return Response.json({ error: parseResult }, { status: 400 })
-        }
- 
-        const { id } = parseResult.data.params
 
-        const { title, content } = parseResult.data.body
+    const { id } = validatedData.params
+    const { title, content } = validatedData.body
         
 
-        const embedding = await getEmbeddingForNote(title, content)
+    const embedding = await getEmbeddingForNote(title, content)
 
-        const note = await prisma.$transaction(async (tx) => {
-            const updatedNote = await tx.note.update({
-                where: { id },
-                data: parseResult.data.body
-            })
+    const note = await prisma.$transaction(async (tx) => {
+      const updatedNote = await tx.note.update({
+        where: { id },
+        data: validatedData.body
+      })
 
-            await index.upsert([{
-                id,
-                values: embedding,
-                metadata: { userId }
-            }])
+      await index.upsert([{
+        id,
+        values: embedding,
+        metadata: { userId }
+      }])
 
-            return updatedNote
-        })
+      return updatedNote
+    })
         
-        return NextResponse.json(note, { status: 200 })
-    } catch (error) {
-        return NextResponse.json({ error }, { status: 500 })
-    }
- }
+    return NextResponse.json(note, { status: 200 })
+  } catch (error) {
+    console.log(error)
+    return NextResponse.json({ error }, { status: 500 })
+  }
+}
  
