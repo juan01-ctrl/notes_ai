@@ -22,8 +22,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "AI Todo App",
-  // description: "AI Todo App",
+  title: "AI Notes App",
 };
 
 export default function RootLayout({
