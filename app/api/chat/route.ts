@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     const { userId } = auth()
 
     const vectorQuery = await index.query({
-      topK: 1,
+      topK: 4,
       vector: embedding,
       filter: { userId }
       // includeMetadata: true
