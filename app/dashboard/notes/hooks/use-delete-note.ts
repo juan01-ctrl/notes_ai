@@ -11,7 +11,7 @@ export const useDeleteNote = () => {
     mutationFn: deleteNote,
     onSuccess: () => {
       toast({
-        title: 'Nota eliminada correctamente'
+        title: 'Note deleted successfully'
       })
       refetchNotes(queryClient)
     }
