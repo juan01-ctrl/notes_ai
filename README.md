@@ -2,11 +2,11 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Environment Variables
 
-Create a .env file at the root of your project based on the .env.template file. This file will hold all sensitive environment variables.
+Create a .env file at the root of your project based on the `.env.template` file. This file will hold all sensitive environment variables.
 
 Make sure to replace placeholder values with your actual keys.
 
-.env.template
+`.env.template`
 
 
 ## Prisma Setup
